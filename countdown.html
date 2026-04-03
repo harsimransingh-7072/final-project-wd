@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tech Innovators Club – Countdown</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- HEADER / NAV -->
+  <header>
+    <div class="nav-container">
+      <div class="logo">
+        <span class="icon">💡</span>
+        Tech Innovators Club
+      </div>
+      <nav>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="schedule.html">Schedule</a></li>
+          <li><a href="calendar.html">Events</a></li>
+          <li><a href="contact.html">Join Us</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+          <li><a href="countdown.html" class="active">Countdown</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main>
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+      <h1>⏳ Event Countdown</h1>
+      <p>Counting down to our next big club event. Don't miss it!</p>
+    </div>
+
+    <!-- COUNTDOWN DISPLAY -->
+    <div class="countdown-wrapper">
+      <h2>⚡ Spring Tech Expo</h2>
+      <p class="next-event" id="eventDate"></p>
+
+      <div class="countdown-display" id="countdownDisplay">
+        <div class="countdown-unit">
+          <span class="num" id="days">00</span>
+          <span class="label">Days</span>
+        </div>
+        <div class="countdown-unit">
+          <span class="num" id="hours">00</span>
+          <span class="label">Hours</span>
+        </div>
+        <div class="countdown-unit">
+          <span class="num" id="minutes">00</span>
+          <span class="label">Minutes</span>
+        </div>
+        <div class="countdown-unit">
+          <span class="num" id="seconds">00</span>
+          <span class="label">Seconds</span>
+        </div>
+      </div>
+
+      <p id="doneMsg" class="countdown-done" style="display:none;">
+        🎉 The event is happening right now (or has passed). See you there!
+      </p>
+    </div>
+
+    <!-- UPCOMING EVENTS -->
+    <h2 class="section-title">📋 All Upcoming Events</h2>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Event</th>
+            <th>Date</th>
+            <th>Location</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="eventsTable"></tbody>
+      </table>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>© 2026 Tech Innovators Club &nbsp;|&nbsp; All Rights Reserved</p>
+  </footer>
+
+  <script>
+    // ===== TARGET EVENT =====
+    // Spring Tech Expo – April 12, 2026 at 9:00 AM
+    const TARGET = new Date("2026-04-12T09:00:00");
+
+    function pad(n) {
+      return String(n).padStart(2, "0");
+    }
+
+    function updateCountdown() {
+      const now  = new Date();
+      const diff = TARGET - now;
+
+      if (diff <= 0) {
+        document.getElementById("countdownDisplay").style.display = "none";
+        document.getElementById("doneMsg").style.display = "block";
+        return;
+      }
+
+      const totalSeconds = Math.floor(diff / 1000);
+      const days    = Math.floor(totalSeconds / 86400);
+      const hours   = Math.floor((totalSeconds % 86400) / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+
+      document.getElementById("days").textContent    = pad(days);
+      document.getElementById("hours").textContent   = pad(hours);
+      document.getElementById("minutes").textContent = pad(minutes);
+      document.getElementById("seconds").textContent = pad(seconds);
+    }
+
+    // Show human-readable event date
+    document.getElementById("eventDate").textContent =
+      "📅 " + TARGET.toLocaleDateString("en-CA", {
+        weekday: "long",
+        year:    "numeric",
+        month:   "long",
+        day:     "numeric",
+        hour:    "2-digit",
+        minute:  "2-digit",
+      });
+
+    // Start ticking
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+
+    // ===== UPCOMING EVENTS TABLE =====
+    const upcomingEvents = [
+      { name: "Spring Tech Expo",       date: new Date("2026-04-12"),  location: "Gymnasium",           status: "Upcoming" },
+      { name: "Game Dev Day",            date: new Date("2026-04-19"),  location: "Room 201",            status: "Upcoming" },
+      { name: "Year-End Showcase",       date: new Date("2026-05-20"),  location: "Room 201",            status: "Upcoming" },
+      { name: "Awards Ceremony",         date: new Date("2026-06-05"),  location: "School Auditorium",   status: "Upcoming" },
+    ];
+
+    const tbody  = document.getElementById("eventsTable");
+    const today  = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    for (const ev of upcomingEvents) {
+      const tr     = document.createElement("tr");
+      const isPast = ev.date < today;
+
+      tr.innerHTML =
+        "<td>" + ev.name + "</td>" +
+        "<td>" + ev.date.toLocaleDateString("en-CA", { year:"numeric", month:"long", day:"numeric" }) + "</td>" +
+        "<td>" + ev.location + "</td>" +
+        "<td><span class='badge' style='" + (isPast ? "background:#ffebee;color:#c62828;" : "") + "'>" +
+          (isPast ? "Completed" : ev.status) +
+        "</span></td>";
+
+      tbody.appendChild(tr);
+    }
+  </script>
+
+</body>
+</html>

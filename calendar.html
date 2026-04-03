@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tech Innovators Club – Events Calendar</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- HEADER / NAV -->
+  <header>
+    <div class="nav-container">
+      <div class="logo">
+        <span class="icon">💡</span>
+        Tech Innovators Club
+      </div>
+      <nav>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="schedule.html">Schedule</a></li>
+          <li><a href="calendar.html" class="active">Events</a></li>
+          <li><a href="contact.html">Join Us</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+          <li><a href="countdown.html">Countdown</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main>
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+      <h1>📆 Events Calendar</h1>
+      <p>Browse upcoming club events, workshops, and competitions.</p>
+    </div>
+
+    <!-- CALENDAR -->
+    <div class="calendar-nav">
+      <button id="prevBtn" onclick="changeMonth(-1)">&#8249; Prev</button>
+      <h2 id="calTitle"></h2>
+      <button id="nextBtn" onclick="changeMonth(1)">Next &#8250;</button>
+    </div>
+    <div class="calendar-grid" id="calendarGrid"></div>
+
+    <!-- EVENTS LEGEND -->
+    <div class="events-legend">
+      <h3>📋 Events This Month</h3>
+      <ul id="eventsList"></ul>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>© 2026 Tech Innovators Club &nbsp;|&nbsp; All Rights Reserved</p>
+  </footer>
+
+  <script>
+    // ===== CLUB EVENTS (month is 0-indexed) =====
+    const clubEvents = [
+      { year: 2026, month: 0,  day: 18, label: "New Member Orientation" },
+      { year: 2026, month: 0,  day: 26, label: "Web Workshop" },
+      { year: 2026, month: 1,  day: 8,  label: "AI Demo Day" },
+      { year: 2026, month: 1,  day: 22, label: "Python Sprint" },
+      { year: 2026, month: 2,  day: 15, label: "Regional Hackathon" },
+      { year: 2026, month: 2,  day: 28, label: "Project Review" },
+      { year: 2026, month: 3,  day: 12, label: "Spring Tech Expo" },
+      { year: 2026, month: 3,  day: 19, label: "Game Dev Day" },
+      { year: 2026, month: 4,  day: 20, label: "Year-End Showcase" },
+      { year: 2026, month: 5,  day: 5,  label: "Awards Ceremony" },
+    ];
+
+    const monthNames = [
+      "January","February","March","April","May","June",
+      "July","August","September","October","November","December"
+    ];
+    const dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
+    // Start at current month
+    const today = new Date();
+    let currentYear  = today.getFullYear();
+    let currentMonth = today.getMonth();
+
+    function getEventsForMonth(year, month) {
+      return clubEvents.filter(e => e.year === year && e.month === month);
+    }
+
+    function renderCalendar(year, month) {
+      const grid  = document.getElementById("calendarGrid");
+      const title = document.getElementById("calTitle");
+      const list  = document.getElementById("eventsList");
+
+      title.textContent = monthNames[month] + " " + year;
+      grid.innerHTML  = "";
+      list.innerHTML  = "";
+
+      // Day headers
+      for (let d = 0; d < 7; d++) {
+        const hdr = document.createElement("div");
+        hdr.className = "cal-day-header";
+        hdr.textContent = dayNames[d];
+        grid.appendChild(hdr);
+      }
+
+      const firstDay    = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const events      = getEventsForMonth(year, month);
+
+      // Empty cells before first day
+      for (let i = 0; i < firstDay; i++) {
+        const empty = document.createElement("div");
+        empty.className = "cal-cell empty";
+        grid.appendChild(empty);
+      }
+
+      // Day cells
+      for (let day = 1; day <= daysInMonth; day++) {
+        const cell  = document.createElement("div");
+        const event = events.find(e => e.day === day);
+
+        cell.className = "cal-cell";
+
+        // Highlight today
+        if (
+          year  === today.getFullYear() &&
+          month === today.getMonth()    &&
+          day   === today.getDate()
+        ) {
+          cell.classList.add("today");
+        }
+
+        const numSpan = document.createElement("span");
+        numSpan.className   = "day-num";
+        numSpan.textContent = day;
+        cell.appendChild(numSpan);
+
+        if (event) {
+          cell.classList.add("event");
+          const lbl = document.createElement("span");
+          lbl.className   = "event-label";
+          lbl.textContent = event.label;
+          cell.appendChild(lbl);
+        }
+
+        grid.appendChild(cell);
+      }
+
+      // Events list
+      if (events.length === 0) {
+        const li = document.createElement("li");
+        li.textContent = "No scheduled events this month.";
+        list.appendChild(li);
+      } else {
+        for (const e of events) {
+          const li  = document.createElement("li");
+          const dot = document.createElement("span");
+          dot.className = "dot";
+          li.appendChild(dot);
+          li.appendChild(
+            document.createTextNode(
+              monthNames[e.month] + " " + e.day + ", " + e.year + " – " + e.label
+            )
+          );
+          list.appendChild(li);
+        }
+      }
+    }
+
+    function changeMonth(delta) {
+      currentMonth += delta;
+      if (currentMonth > 11) { currentMonth = 0;  currentYear++; }
+      if (currentMonth < 0)  { currentMonth = 11; currentYear--; }
+      renderCalendar(currentYear, currentMonth);
+    }
+
+    // Initial render
+    renderCalendar(currentYear, currentMonth);
+  </script>
+
+</body>
+</html>
